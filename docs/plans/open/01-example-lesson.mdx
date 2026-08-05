@@ -1,0 +1,187 @@
+# 01 — Example lesson: append-only log records
+
+Depends on: nothing.
+
+Tier: 1 — toy primitive.
+
+<Callout tone="system" title="Template artifact">
+  This lesson ships with the template to demonstrate the required structure from
+  `plans/AGENTS.md` and the components from `reader-guide.mdx`. When a real learning
+  path is generated, it replaces this file. It is also a genuinely workable first
+  exercise if you want to test-drive the workflow.
+</Callout>
+
+## Summary
+
+Build a tiny append-only log in `internal/wal`: fixed-format records written to a
+single file, with a reader that replays every record in order and detects a torn final
+write. This is a tier-1 toy primitive — the point is to understand why durable systems
+write intent to disk before acting on it, not to build a production WAL. Later lessons
+that need durability will assume you can reason about "what survives a crash here?".
+
+## Why this matters
+
+Every durable system you will meet later in a path — PostgreSQL, etcd's raft store,
+Kafka's partitions — is an append-only log at the bottom. The write path is always the
+same shape: encode a record, append it, flush, and only then acknowledge. Crash
+recovery is always the same shape too: replay from the start, stop at the first record
+that fails its checksum.
+
+<KeyPoint label="Invariant">
+  A record is only durable after the write and the flush both return. Anything after
+  the last valid checksum is garbage from a torn write and must be truncated, not
+  repaired.
+</KeyPoint>
+
+## Key concepts
+
+- Binary record framing: length prefix, payload, checksum (`encoding/binary`,
+  `hash/crc32`).
+- The difference between `Write` returning and data being on disk (`os.File.Sync`).
+- Replay as the recovery mechanism: state is a fold over the log.
+- Detecting a torn write at the tail and truncating to the last valid record.
+
+## Design and interfaces
+
+```go
+package wal
+
+// Log appends opaque payloads durably and replays them in append order.
+type Log interface {
+	Append(payload []byte) error
+	// Replay calls fn for each intact record in order and truncates any torn tail.
+	Replay(fn func(payload []byte) error) error
+	Close() error
+}
+
+func Open(path string) (Log, error)
+```
+
+## Invariants
+
+| Invariant | Enforced by |
+| --- | --- |
+| A record is durable once `Append` returns | `TestAppendThenReplayRoundTrips` + the Break-it kill |
+| Replay is deterministic: same file, same fold | `TestAppendAfterRecoveryContinuesLog` |
+| Nothing after the last valid checksum survives replay | `TestReplayStopsAtTornTailAndTruncates` |
+
+## Tasks
+
+<TaskList>
+  <Task title="Define the record format">
+    Choose the on-disk framing: length, CRC, payload. Write it down as a comment in
+    the package before coding.
+  </Task>
+  <Task title="Implement Append">
+    Encode, write, and sync. Decide what error the caller sees when sync fails.
+  </Task>
+  <Task title="Implement Replay">
+    Read records in order; stop cleanly at EOF or at the first corrupt record.
+  </Task>
+  <Task title="Handle the torn tail">
+    Make Replay truncate a partial final record so the next Append starts clean.
+  </Task>
+</TaskList>
+
+## Hint steps
+
+<HintSteps>
+  <Hint
+    title="Start from the record format"
+    check="You can say exactly how many bytes a 5-byte payload occupies on disk."
+  >
+    Sketch the frame before writing code: a fixed-size header (length + CRC) followed
+    by the payload. `binary.LittleEndian` and `crc32.ChecksumIEEE` are enough.
+  </Hint>
+  <Hint
+    title="Append is write plus sync"
+    check="Killing the process right after Append returns never loses that record."
+  >
+    `os.File.Write` hands data to the kernel, not the disk. Look at `File.Sync` and
+    decide where it belongs in Append.
+  </Hint>
+  <Hint
+    title="Replay is a loop over frames"
+    check="Replaying a three-record file calls fn exactly three times, in order."
+  >
+    Read the header, then exactly `length` payload bytes, verify the CRC, hand the
+    payload to fn. `io.ReadFull` tells you when the file ends mid-frame.
+  </Hint>
+  <Hint
+    title="Diagnosing the torn-tail test"
+    check="After truncation, a subsequent Append and Replay round-trips cleanly."
+  >
+    The negative test truncates the file mid-record to simulate a crash. If your
+    Replay errors instead of truncating, you are treating a torn tail as corruption of
+    the whole log — only bytes after the last valid record are suspect.
+  </Hint>
+</HintSteps>
+
+## Definition of done
+
+The agent generates these tests in `internal/wal` before implementation starts; done
+means `make test` passes with all of them present and meaningful:
+
+- `TestAppendThenReplayRoundTrips`
+- `TestReplayEmptyLogCallsNothing`
+- `TestReplayStopsAtTornTailAndTruncates` (negative case)
+- `TestAppendAfterRecoveryContinuesLog`
+
+A property-based test that random payload sequences always round-trip is a worthwhile
+stretch goal. Deliberately untested: real power-loss behavior (`Sync` is trusted) and
+concurrent appenders (the toy log is single-writer).
+
+### Break it
+
+Run `bash hack/break-01.sh` — an agent-written script that starts a tiny writer
+appending a record via `internal/wal` every 10ms, sends it `kill -9` after about a
+second, then runs replay and prints what it recovered. The agent generates this
+script alongside the lesson's tests.
+
+<StudyPrompt>
+  Before running the kill: write down how many records you expect replay to recover,
+  and what state you expect the file's tail to be in. Record the prediction — it goes
+  in your design note next to what actually happened.
+</StudyPrompt>
+
+### Observe it
+
+From your output alone (prints are fine this early; structured logs arrive in the
+observability lesson): which record was mid-write when the process died, and how does
+the file's byte length prove it? Cite the evidence, don't re-derive it from the code.
+
+## Solo-developer tradeoffs
+
+A production WAL adds segment rotation, preallocation, group commit, and CRC of the
+header separately from the payload. This lesson skips all of it: one file, one writer,
+sync on every append. Slow and simple is correct here — the concept being bought is
+durability reasoning, and every skipped feature is listed so it is a decision, not an
+accident.
+
+## Go deeper
+
+<Resources>
+  <Resource
+    kind="article"
+    title="Files are hard"
+    href="https://danluu.com/file-consistency/"
+  >
+    Why write/sync ordering is genuinely difficult; catalogs real-world fsync bugs
+    beyond this lesson's trusted-Sync model.
+  </Resource>
+  <Resource kind="book" title="Database Internals" by="Alex Petrov, O'Reilly 2019">
+    Chapter on file formats and WALs shows how production systems frame, batch, and
+    rotate what this lesson builds in one file.
+  </Resource>
+</Resources>
+
+## Design note
+
+Write a half page in your own words to `docs/notes/01-example-lesson.md`, covering:
+
+1. What I built, and the one invariant it protects.
+2. The fault I induced, what I predicted, and what actually happened.
+3. What production WALs do differently, and why this toy deliberately doesn't.
+
+The note is yours — the agent doesn't draft it. Publishing it anywhere is a separate,
+manual choice.

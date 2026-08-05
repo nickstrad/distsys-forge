@@ -1,0 +1,46 @@
+# Documentation index
+
+This directory is the project's documentation root. The human-facing reader shows the
+learning path under `plans/`; everything else here supports the agents and the learner
+working on the path.
+
+## Layout
+
+- [`plans/open/`](plans/open/) — lessons that are planned or in progress, numbered in
+  intended order. Do not start a lesson merely because it exists; the learner chooses
+  when to begin.
+- [`plans/closed/`](plans/closed/) — completed lessons retained as history. They may
+  explain why something changed, but the current code and tests remain authoritative.
+- [`plans/AGENTS.md`](plans/AGENTS.md) — the authoring contract for lessons: the
+  three-tier shape, required sections, the agent-writes-tests workflow, and the
+  verifiable definition-of-done rules. Read it before writing or editing any lesson.
+- [`reader-guide.mdx`](reader-guide.mdx) — the MDX components available to lessons
+  (callouts, hints, task lists, resources, diagrams) with live examples.
+- [`reference/`](reference/) — forward-looking technical notes that outgrow a single
+  lesson (error-handling conventions, package boundaries, testing architecture). Not a
+  specification for current behavior.
+
+## The learning path at a glance
+
+The path has three tiers, all building toward one capstone:
+
+| Tier | Teaches | Shape |
+| --- | --- | --- |
+| 1 | Building-block theory (toy primitives in Go, Maelstrom-graded where a workload matches) | Small run-break-observe exercises, one or two sittings each |
+| 2 | Production primitives (etcd, Postgres, NATS, …) | Focused integration modules |
+| 3 | The capstone project | Larger, multi-package composition of tiers 1–2, ending in an ops slice on real nodes |
+
+Beyond the default lesson shape, the path schedules four special types — **code-reading**
+(walk a production implementation of a problem you just fumbled), **revisit** (upgrade an
+earlier toy under capstone pressure), **ops/runbook** (deploy, upgrade, recover on real
+machines), and **debugging drills** (diagnose a planted bug from symptoms alone).
+
+Design notes — the half-page write-up closing every lesson — live in
+[`notes/`](notes/), one per completed lesson.
+
+Update this index when lessons are added, moved, or closed.
+
+## Working on the docs
+
+From the repository root: `make docs` starts the local reader, `make docs-build`
+type-checks and produces the static build that CI deploys to GitHub Pages.
