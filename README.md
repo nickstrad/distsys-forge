@@ -11,8 +11,8 @@ Each instance of this template is one learning path aimed at one capstone projec
    building-block theory (a write-ahead log, leases, a hash ring, …).
 2. **Tier 2 — production primitives.** Focused modules on real infrastructure (etcd,
    PostgreSQL, NATS, …) — just the patterns the capstone needs.
-3. **Tier 3 — capstone.** A resume-grade project that composes the earlier tiers into
-   a real system, finished with an ops slice on real nodes.
+3. **Tier 3 — capstone.** A working distributed system that composes the earlier
+   tiers, finished with an ops slice on real nodes.
 
 The workflow is **run, break, observe, debug** — not read-implement-pass. Lessons
 define interfaces and concepts, the agent generates the tests, and **you write every
