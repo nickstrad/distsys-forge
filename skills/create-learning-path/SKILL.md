@@ -16,8 +16,8 @@ primitives), production primitives are the reliable building blocks (tier 2), an
 composition patterns — control plane vs. data plane, idempotency, leases, leader
 election, heartbeats, optimistic concurrency, work queues, backoff — are what the
 capstone exercises (tier 3). The goal is excellence at **composing** reliable systems,
-not re-implementing consensus forever. Each capstone should be an EXCELLENT resume
-artifact: MVP scope, not a production application.
+not re-implementing consensus forever. Each capstone should be a working distributed
+system: MVP scope, not a production application.
 
 Paths are **run-break-observe-debug**, not read-implement-pass: every lesson runs real
 processes, breaks one thing with a written prediction first, asks a question answerable
@@ -59,8 +59,9 @@ Cover:
 4. **Testing appetite.** TDD is the floor everywhere; external checkers (Maelstrom)
    grade every primitive that matches a standard workload. Ask where to plan stronger
    methods beyond that — property-based tests, fuzzing, fault-injection, Jepsen-style
-   chaos validation of the capstone — since these improve the final product and the
-   resume story. Note explicitly: the agent generates the tests at each step; the
+   chaos validation of the capstone — since these improve the final system and how
+   well it holds up under failure. Note explicitly: the agent generates the tests at
+   each step; the
    user focuses on implementing and learning.
 5. **Environment.** Local processes only vs. Docker vs. real VMs/cloud — this decides
    how faults are realized (see the contract's degradation rules) and whether the ops
