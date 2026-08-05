@@ -1,11 +1,11 @@
 ---
 name: create-learning-path
-description: This skill should be used when the user asks to "create a learning path", "start a new learning-path project", "make a new path from the template", or wants to design a tiered Go learning project (toy primitives → production primitives → capstone) from ~/Software/learning-path-template. Bootstraps the project with a deterministic script, interviews the user, then generates the lesson sequence.
+description: This skill should be used when the user asks to "create a learning path", "start a new learning-path project", "make a new path from the template", or wants to design a tiered Go learning project (toy primitives → production primitives → capstone) from ~/Software/distributed-systems-project-template. Bootstraps the project with a deterministic script, interviews the user, then generates the lesson sequence.
 ---
 
 # Create a learning path
 
-Instantiate `~/Software/learning-path-template` as a new project, interview the user to
+Instantiate `~/Software/distributed-systems-project-template` as a new project, interview the user to
 design a three-tier learning path aimed at one capstone, and write the lessons.
 
 ## Who this is for (default assumptions, refine in the interview)
@@ -30,7 +30,7 @@ Ask for the project slug (lowercase-kebab) and display name if not given, then r
 script that ships inside the template:
 
 ```sh
-"${LEARNING_PATH_TEMPLATE:-$HOME/Software/learning-path-template}/scripts/new-learning-path.sh" <slug> "<Display Name>"
+"${LEARNING_PATH_TEMPLATE:-$HOME/Software/distributed-systems-project-template}/scripts/new-learning-path.sh" <slug> "<Display Name>"
 ```
 
 Use the script rather than copying files yourself — it is the deterministic path: it

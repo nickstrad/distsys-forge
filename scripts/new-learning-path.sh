@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Instantiate ~/Software/learning-path-template as a new, working learning-path
+# Instantiate ~/Software/distributed-systems-project-template as a new, working learning-path
 # project: copy, rename placeholders, roll a random cohesive color scheme, install
 # dependencies, and verify the Go and docs builds. Deterministic apart from the hue.
 #
@@ -11,7 +11,7 @@
 #   parent-dir   where the project folder is created; defaults to ~/Software
 set -euo pipefail
 
-TEMPLATE="${LEARNING_PATH_TEMPLATE:-$HOME/Software/learning-path-template}"
+TEMPLATE="${LEARNING_PATH_TEMPLATE:-$HOME/Software/distributed-systems-project-template}"
 
 SLUG="${1:-}"
 if [[ ! "$SLUG" =~ ^[a-z][a-z0-9-]*$ ]]; then
