@@ -1,4 +1,4 @@
-# distributed-systems-project-template
+# distsys-forge
 
 A template for **learning-path projects**: a Go codebase you build yourself by working
 through a three-tier sequence of lessons, published as a static MDX reader site. This
@@ -23,16 +23,16 @@ The full authoring contract is [`docs/plans/AGENTS.md`](docs/plans/AGENTS.md).
 
 ## Installing the tooling (one-time, global)
 
-Clone this repo to `~/Software/distributed-systems-project-template` (or anywhere — set
+Clone this repo to `~/Software/distsys-forge` (or anywhere — set
 `LEARNING_PATH_TEMPLATE` to the clone path if elsewhere), then wire the two tools into
 your machine:
 
 ```sh
 # 1. The bootstrap script — symlink it onto your PATH (or into your scripts folder):
-ln -s ~/Software/distributed-systems-project-template/scripts/new-learning-path.sh ~/Software/general-scripts/new-learning-path.sh
+ln -s ~/Software/distsys-forge/scripts/new-learning-path.sh ~/Software/general-scripts/new-learning-path.sh
 
 # 2. The Claude Code skill — symlink it into your user skills directory:
-ln -s ~/Software/distributed-systems-project-template/skills/create-learning-path ~/.claude/skills/create-learning-path
+ln -s ~/Software/distsys-forge/skills/create-learning-path ~/.claude/skills/create-learning-path
 ```
 
 Symlinks (rather than copies) mean a `git pull` of this repo updates both tools. The
@@ -46,7 +46,7 @@ Ask Claude Code to "create a learning path" (the skill runs the script, intervie
 you, and generates the lesson sequence), or run the script directly:
 
 ```sh
-~/Software/distributed-systems-project-template/scripts/new-learning-path.sh my-project "My Project"
+~/Software/distsys-forge/scripts/new-learning-path.sh my-project "My Project"
 ```
 
 It copies this template (minus `scripts/` and `skills/`), renames every

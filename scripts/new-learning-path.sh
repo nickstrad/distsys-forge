@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Instantiate ~/Software/distributed-systems-project-template as a new, working learning-path
+# Instantiate ~/Software/distsys-forge as a new, working learning-path
 # project: copy, rename placeholders, roll a random cohesive color scheme, install
 # dependencies, and verify the Go and docs builds. Deterministic apart from the hue.
 #
@@ -11,7 +11,7 @@
 #   parent-dir   where the project folder is created; defaults to ~/Software
 set -euo pipefail
 
-TEMPLATE="${LEARNING_PATH_TEMPLATE:-$HOME/Software/distributed-systems-project-template}"
+TEMPLATE="${LEARNING_PATH_TEMPLATE:-$HOME/Software/distsys-forge}"
 
 SLUG="${1:-}"
 if [[ ! "$SLUG" =~ ^[a-z][a-z0-9-]*$ ]]; then
@@ -51,7 +51,7 @@ cat > "$TARGET/README.md" <<EOF
 # $SLUG
 
 $DISPLAY — a learning-path project instantiated from
-[distributed-systems-project-template](https://github.com/nickstrad/distributed-systems-project-template).
+[distsys-forge](https://github.com/nickstrad/distsys-forge).
 
 The lesson sequence lives in [docs/plans/](docs/plans/); run \`make docs\` to read it
 locally. Lessons define interfaces and concepts, the agent generates the tests, and the
